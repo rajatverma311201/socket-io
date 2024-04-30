@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>CHAT</title>
+
+
+</head>
+
+<body class="w-full">
+
+
+    <div class="p-10 h-full">
+        <form id="message-form" class="w-full mb-10 text-center">
+            <input id="user-message" type="text" placeholder="Enter your message"
+                class="border py-2 px-4 rounded w-96 full mr-5" />
+
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Send</button>
+        </form>
+
+        <ul id="messages" class="w-full border min-h-96 rounded-md">
+            <!-- THIS WILL BE POPULATED BY JAVASCRIPT! -->
+        </ul>
+
+    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+
+        const msgForm = document.querySelector('#message-form');
+        const msgList = document.querySelector('#messages');
+
+
+        console.log('Hello');
+
+        const socket = io('http://localhost:8001');
+
+        socket.on('connect', () => {
+            console.log('Connected');
+        });
+
+        socket.on('messageFromServer', (data) => {
+            console.log(data);
+        });
+
+        // socket.emit("messageFromClient", "This is a message from the client!")
+
+
+        msgForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newMessage = document.querySelector('#user-message').value;
+            socket.emit('newMessageToServer', { text: newMessage });
+
+            msgForm.reset();
+        });
+
+        socket.on('newMessageToClients', (msg) => {
+            const newMessage = document.createElement('li');
+            newMessage.innerText = msg.text;
+            msgList.appendChild(newMessage);
+        });
+
+    </script>
+
+
+</body>
+
+</html>
